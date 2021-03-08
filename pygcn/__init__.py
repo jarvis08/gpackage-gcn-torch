@@ -4,4 +4,5 @@ from __future__ import division
 from .layers import *
 from .models_gdp import *
 from .utils_gdp import *
+from .models import *
 from .utils import *
