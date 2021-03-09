@@ -83,6 +83,22 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     return torch.sparse.FloatTensor(indices, values, shape)
 
 
+def load_embedding_from_txt(file_name):
+    names = []
+    embeddings = []
+    with open(file_name, 'r') as f:
+        first_line = True
+        for line in f:
+            if first_line:
+                first_line = False
+                continue
+            splitted = line.split()
+            names.append(splitted[0])
+            embeddings.append([float(value) for value in splitted[1:]])
+    print(len(names)," nodes loaded.")
+    return names, embeddings
+
+
 def load_labels(path):
     return np.load(path + "/labels.npy")
 
@@ -106,18 +122,30 @@ def load_folded_dataset(path):
     return  fltr, features, train_mask, valid_mask
 
 
-def load_embedding_from_txt(file_name):
-    names = []
-    embeddings = []
-    with open(file_name, 'r') as f:
-        first_line = True
-        for line in f:
-            if first_line:
-                first_line = False
-                continue
-            splitted = line.split()
-            names.append(splitted[0])
-            embeddings.append([float(value) for value in splitted[1:]])
-    print(len(names)," nodes loaded.")
-    return names, embeddings
+def load_ms_dataset(path):
+    with open(path + "/train_graph.json", 'r') as f:
+        graph_json = json.load(f)
+    graph = nx.json_graph.node_link_graph(graph_json)
+    adjacency_mat = nx.adjacency_matrix(graph)
+    fltr = gcn_filter(adjacency_mat).astype('f4')
+    fltr = sp.coo_matrix(fltr)
+    train_fltr = sparse_mx_to_torch_sparse_tensor(fltr)
+    train_features = np.load(path + "/train_feats.npy")
+    train_labels = np.load(path + "/train_labels.npy")
+
+    with open(path + "/valid_graph.json", 'r') as f:
+        graph_json = json.load(f)
+    graph = nx.json_graph.node_link_graph(graph_json)
+    adjacency_mat = nx.adjacency_matrix(graph)
+    fltr = gcn_filter(adjacency_mat).astype('f4')
+    fltr = sp.coo_matrix(fltr)
+    valid_fltr = sparse_mx_to_torch_sparse_tensor(fltr)
+    valid_features = np.load(path + "/valid_feats.npy")
+    valid_labels = np.load(path + "/valid_labels.npy")
+
+    train_features = torch.FloatTensor(train_features)
+    valid_features = torch.FloatTensor(valid_features)
+    train_labels = torch.FloatTensor(train_labels)
+    valid_labels = torch.FloatTensor(valid_labels)
+    return train_fltr, valid_fltr, train_features, valid_features, train_labels, valid_labels
 

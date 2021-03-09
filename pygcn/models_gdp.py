@@ -7,15 +7,24 @@ class GCN(nn.Module):
     def __init__(self, nfeat, nhid, nclass, dropout):
         super(GCN, self).__init__()
 
-        self.gc1 = GraphConvolution(nfeat, 512)
-        self.gc2 = GraphConvolution(512, 256)
-        self.gc3 = GraphConvolution(256, 128)
-        self.gc4 = GraphConvolution(128, nhid)
-        self.linear1 = nn.Linear(nhid, 1024)
-        self.linear2 = nn.Linear(1024, 1024)
-        self.linear3 = nn.Linear(1024, 1024)
-        self.linear4 = nn.Linear(1024, nclass)
+        self.gc1 = GraphConvolution(nfeat, 1024)
+        self.gc2 = GraphConvolution(1024, 1024)
+        self.gc3 = GraphConvolution(1024, 1024)
+        self.gc4 = GraphConvolution(1024, nhid)
+        self.linear1 = nn.Linear(nhid, 2048)
+        self.linear2 = nn.Linear(2048, 2048)
+        self.linear3 = nn.Linear(2048, 2048)
+        self.linear4 = nn.Linear(2048, nclass)
         self.dropout = dropout
+        #self.gc1 = GraphConvolution(nfeat, 512)
+        #self.gc2 = GraphConvolution(512, 256)
+        #self.gc3 = GraphConvolution(256, 128)
+        #self.gc4 = GraphConvolution(128, nhid)
+        #self.linear1 = nn.Linear(nhid, 1024)
+        #self.linear2 = nn.Linear(1024, 1024)
+        #self.linear3 = nn.Linear(1024, 1024)
+        #self.linear4 = nn.Linear(1024, nclass)
+        #self.dropout = dropout
 
     def forward(self, x, adj):
         x = F.relu(self.gc1(x, adj))
