@@ -22,7 +22,12 @@ networkx              2.5
 
 ```bash
 $ cd pygcn
+
+# GDP dataset
 $ python train_gdp.py
+
+# MS-PPI dataset
+$ python train_ms.py
 ```
 
 ## References
